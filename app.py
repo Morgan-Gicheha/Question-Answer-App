@@ -27,6 +27,7 @@ def create():
 
 # importing WTForms
 from form_wtf.registeration import Register_qa
+from form_wtf.login import Login
 
 
 @app.route("/register",methods=["POST","GET"])
@@ -49,9 +50,24 @@ def register():
 
     return render_template("register.html",form=form)
 
-@app.route("/login")
+@app.route("/login",methods=["POST","GET"])
 def login():
-    return render_template("login.html")
+    form = Login()
+    if form.validate_on_submit():
+        if request.method=="POST":
+            name = form.name.data
+            password = form.password.data
+            # searching for username
+            search_username= User_qa.query.filter_by(name=name).first()
+            if search_username:
+                password_check = User_qa.search_name_and_password(search_username.name,search_username.password)
+                return "login success"
+            else:
+                return "error login"
+
+
+
+    return render_template("login.html",form=form)
 
 @app.route("/")
 def home():
@@ -76,6 +92,10 @@ def users():
 @app.route("/question")
 def question():
     return render_template ("question.html")
+
+@app.route("/logout")
+def logout():
+    return "logge out"
 
 
 

@@ -1,4 +1,5 @@
 from app import db
+from werkzeug.security import check_password_hash
 
 class User_qa(db.Model):
     '''this class stores users creadentials..eg name, password'''
@@ -12,3 +13,13 @@ class User_qa(db.Model):
         '''sends to the db'''
         db.session.add(self)
         db.session.commit()
+
+    # function to search for name and password
+    @classmethod
+    def search_name_and_password(cls,name,password):
+        '''this fuction checks for te name and password'''
+        name_check=cls.query.filter_by(name=name).first()
+        if name_check and check_password_hash(name_check.password,password):
+            return True
+        else:
+            return False

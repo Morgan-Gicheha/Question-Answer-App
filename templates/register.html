@@ -63,6 +63,13 @@
                 <label for="inputPassword" class="col-lg-2 control-label">confirm password</label>
                 <div class="col-lg-10">
                   {{form.confirm_password(class="form-control",placeholder="Password")}}
+                  {% for error in form.password.errors %}
+                  <ul>
+                      <li style="color:white;">
+                          {{error}}
+                      </li>
+                  </ul>
+                  {% endfor %}
                   
                 </div>
               </div><br><br>
