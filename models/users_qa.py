@@ -1,7 +1,8 @@
 from app import db
 from werkzeug.security import check_password_hash
+from flask_login import UserMixin
 
-class User_qa(db.Model):
+class User_qa(UserMixin, db.Model):
     '''this class stores users creadentials..eg name, password'''
     id = db.Column(db.Integer, primary_key=True)
     email = db.Column(db.String(),unique=False, nullable=False)

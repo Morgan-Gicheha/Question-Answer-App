@@ -4,11 +4,7 @@
 
   <div class="page-header">
     <h1 style="text-align:center">Login</h1>
-    {% if message %}
-    <span>{{message}}</span>
-    
-    
-    {% endif %}
+
   </div>
   <form action="/login" method="POST">
     {{ form.csrf_token }}
