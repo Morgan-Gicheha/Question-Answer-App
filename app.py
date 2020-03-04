@@ -95,8 +95,6 @@ def login():
     return render_template("login.html",form=form)
 
 
-
-
 @app.route("/")
 @login_required
 def home():
@@ -136,6 +134,7 @@ def promote(username):
 
     return redirect(url_for("users"))
 
+# this route fetche sthe alst question aske and should be viewd by  user
 @app.route("/question")
 @login_required
 def question():
