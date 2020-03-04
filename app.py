@@ -1,4 +1,4 @@
-from flask import Flask,render_template,request,redirect,url_for, flash
+from flask import Flask,render_template,request,redirect,url_for, flash,request
 from flask_sqlalchemy import SQLAlchemy
 from werkzeug.security import generate_password_hash ,check_password_hash
 from flask_login import LoginManager,logout_user,login_fresh,login_required,logout_user, login_user, current_user
@@ -117,10 +117,24 @@ def answer():
 def unanswered():
     return render_template("unanswered.html")
 
-@app.route("/users")
+@app.route("/users",methods=["POST","GET"])
 @login_required
 def users():
-    return render_template("users.html")
+    # quering all users
+    users= User_qa.query.all()
+    
+
+    return render_template("users.html", users=users)
+
+# rout to promot users to experts
+@app.route("/promote/<username>",methods=["GET"])
+def promote(username):
+
+    if request.method == "GET":
+        print(username)
+        User_qa.promote(username)
+
+    return redirect(url_for("users"))
 
 @app.route("/question")
 @login_required
@@ -131,7 +145,7 @@ def question():
 @login_required
 def logout():
     logout_user()
-    return "logge out"
+    return redirect(url_for("login"))
 
 
 

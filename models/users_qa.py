@@ -8,6 +8,8 @@ class User_qa(UserMixin, db.Model):
     email = db.Column(db.String(),unique=False, nullable=False)
     name= db.Column(db.String(20),nullable=False)
     password= db.Column(db.String(),nullable=False)
+    is_admin= db.Column(db.Boolean,default=False)
+    is_expert = db.Column(db.Boolean,default=False)
 
     # committing to the database
     def create(self):
@@ -24,3 +26,15 @@ class User_qa(UserMixin, db.Model):
             return True
         else:
             return False
+
+    # updating admin role
+    @classmethod
+    def promote(cls,name):
+        user= cls.query.filter_by(name=name).first()
+        if user:
+            print(user.is_expert)
+            user.is_expert = True
+            db.session.commit()
+            return True
+
+
