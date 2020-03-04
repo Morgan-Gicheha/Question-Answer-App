@@ -3,6 +3,7 @@ from flask_sqlalchemy import SQLAlchemy
 from werkzeug.security import generate_password_hash ,check_password_hash
 from flask_login import LoginManager,logout_user,login_fresh,login_required,logout_user, login_user, current_user
 import random
+import psycopg2
 
 app= Flask(__name__)
 
@@ -14,6 +15,9 @@ app.config["SQLALCHEMY_DATABASE_URI"]="postgresql://postgres:morgan8514@127.0.0.
 app.config["SECRET_KEY"]="secretrer"
 
 db = SQLAlchemy(app)
+# connecting to an existing database in order to use psycopg2
+conn = psycopg2.connect("dbname=QA_app user=postgres password=morgan8514")
+cur = conn.cursor()
 
 # configuring flask-login
 login_manager =  LoginManager(app)
@@ -28,6 +32,7 @@ def user_loader(user_id):
 
 # importing models
 from models.users_qa import User_qa
+from models.questions import Questions_qa
 
 @app.before_first_request
 def create():
@@ -100,19 +105,41 @@ def login():
 def home():
     return render_template("home.html")
 
-@app.route("/ask")
+@app.route("/ask",methods=["POST","GET"])
 @login_required
 def ask():
-    return render_template("ask.html")
+
+    # quering for experts
+    experts =cur.execute("SELECT * FROM user_qa WHERE IS_EXPERT=True;")
+    experts=cur.fetchall()
+    if request.method=="POST":
+        question = request.form["question"]
+        expert_id= request.form["expert_id"]
+
+        # committing to db
+        question_to_db= Questions_qa(question=question,expert_id=expert_id)
+        question_to_db.create()
+
+    return render_template("ask.html",experts=experts)
 
 @app.route("/answer")
 @login_required
 def answer():
     return render_template("answer.html")
 
+# route views unanswered question for the expert
 @app.route("/unanswered")
 @login_required
 def unanswered():
+    logged_user= current_user.id
+    questions_per_expert=cur.execute("SELECT * FROM questions_qa WHERE expert_id={};".format(logged_user))
+
+    questions_per_expert=cur.fetchall()
+
+    
+
+    
+    
     return render_template("unanswered.html")
 
 @app.route("/users",methods=["POST","GET"])
@@ -120,7 +147,6 @@ def unanswered():
 def users():
     # quering all users
     users= User_qa.query.all()
-    
 
     return render_template("users.html", users=users)
 
